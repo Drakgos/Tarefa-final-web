@@ -21,13 +21,13 @@ export default function RootLayout({ children }) {
                 {/* Menu de Autenticação */}
                 <div className="flex items-center gap-4">
                     <Link
-                        href="/aut/login"
+                        href="/auth/login"
                         className="text-sm font-semibold text-slate-400 hover:text-white transition-colors"
                     >
                         Entrar
                     </Link>
                     <Link
-                        href="/aut/register"
+                        href="/auth/register"
                         className="px-4 py-2 bg-yellow-500 text-black text-sm font-bold rounded-lg hover:bg-yellow-600 shadow-md shadow-yellow-500/10 active:scale-95 transition-all"
                     >
                         Criar Conta
