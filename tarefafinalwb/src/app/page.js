@@ -1,92 +1,98 @@
 import React from 'react';
 import { fetchGames } from './api/api';
-import Link from 'next/link';
 
 export default async function HomePage() {
-    const response = await fetchGames();
-    const games = response?.data || [];
+    let games = [];
+    try {
+        const response = await fetchGames();
+        games = response?.data || [];
+    } catch (error) {
+        console.error("Erro a ir buscar jogos:", error);
+    }
 
     const calcularMedia = (reviews) => {
         const listaReviews = Array.isArray(reviews) ? reviews : reviews?.data || [];
-        if (listaReviews.length === 0) return 'N/A';
-
-        const total = listaReviews.reduce((acc, r) => {
-            const nota = r.Avaliacao ?? r.attributes?.Avaliacao ?? 0;
-            return acc + nota;
-        }, 0);
-
+        if (listaReviews.length === 0) return '—';
+        const total = listaReviews.reduce((acc, r) => acc + (r.Avaliacao ?? r.attributes?.Avaliacao ?? 0), 0);
         return (total / listaReviews.length).toFixed(1);
     };
 
     return (
-        <main className="min-h-screen bg-slate-950 text-slate-100 pb-12">
-            {/* Secção Hero de Destaque */}
-            <div className="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800/60 py-16 px-8 mb-12">
-                <div className="max-w-7xl mx-auto text-center sm:text-left">
-                    <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
-                        Descobre o teu próximo <span className="text-yellow-500">Jogo</span>
+        <main className="bg-dark text-white min-vh-screen">
+            {/* Jumbotron / Hero Banner com Bootstrap */}
+            <div className="py-5 mb-5" style={{ background: 'linear-gradient(180deg, #1e293b 0%, #212529 100%)', borderBottom: '1px solid #343a40' }}>
+                <div className="container px-4">
+                    <h1 className="display-4 fw-black text-white">
+                        Descobre o teu próximo <span className="text-warning">Jogo</span>
                     </h1>
-                    <p className="text-lg text-slate-400 max-w-2xl">
-                        As avaliações e classificações da comunidade gamer que mais te interessam. Tudo num só lugar.
+                    <p className="lead text-secondary" style={{ maxWidth: '650px' }}>
+                        Explora classificações, acompanha tendências e partilha as tuas avaliações com a maior comunidade gamer.
                     </p>
                 </div>
             </div>
 
-            {/* Grelha de Jogos */}
-            <div className="max-w-7xl mx-auto px-8">
-                <div className="flex items-center justify-between mb-8">
-                    <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-                        <span className="h-6 w-1.5 bg-yellow-500 rounded-full inline-block"></span>
-                        Jogos em Destaque
-                    </h2>
+            {/* Contentor Principal dos Jogos */}
+            <div className="container px-4 mb-5">
+                <div className="d-flex align-items-center mb-4">
+                    {/* Linha vertical decorativa amarela */}
+                    <div className="bg-warning rounded" style={{ width: '6px', height: '30px', marginRight: '12px' }}></div>
+                    <h2 className="h4 text-uppercase fw-bold m-0 tracking-wider">Jogos Populares</h2>
                 </div>
 
                 {games.length === 0 ? (
-                    <div className="text-center py-12 bg-slate-900/40 rounded-xl border border-slate-800 border-dashed">
-                        <p className="text-slate-400">Nenhum jogo disponível na base de dados de momento.</p>
+                    <div className="text-center py-5 text-secondary border border-secondary border-dashed rounded-3">
+                        <p className="m-0 fs-5">Nenhum jogo listado ou base de dados desligada.</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    /* Grelha Responsiva do Bootstrap (1 coluna em mobile, 2 em SM, 3 em MD, 4 em LG) */
+                    <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
                         {games.map((game) => {
                             const dados = game.attributes ? game.attributes : game;
                             const { Titulo, Ano_lancamento, Capa, reviews } = dados;
-                            const imgUrl = Capa?.url || Capa?.data?.attributes?.url || '/placeholder.png';
+
+                            const rawUrl = Capa?.url || Capa?.data?.attributes?.url;
+                            const imgUrl = rawUrl
+                                ? `http://localhost:1337${rawUrl}`
+                                : 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=500';
+
                             const nota = calcularMedia(reviews);
 
                             return (
-                                <div
-                                    key={game.id}
-                                    className="group bg-slate-900/70 rounded-xl border border-slate-800/80 overflow-hidden shadow-lg hover:shadow-2xl hover:border-slate-700/50 transition-all duration-300 flex flex-col backdrop-blur-sm"
-                                >
-                                    {/* Container da Imagem com Efeito de Zoom */}
-                                    <div className="relative aspect-[3/4] w-full bg-slate-950 overflow-hidden">
-                                        <div
-                                            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
-                                            style={{ backgroundImage: `url(${imgUrl})` }}
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-60" />
+                                <div key={game.id} className="col">
+                                    {/* Card do Bootstrap estilizado para modo escuro */}
+                                    <div className="card h-100 bg-secondary bg-opacity-10 border-secondary border-opacity-25 text-white shadow rounded-4 overflow-hidden position-relative group-card">
 
-                                        {/* Badge de Nota estilo IMDb */}
-                                        <div className="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-md text-yellow-400 px-2.5 py-1 rounded-lg font-black text-sm flex items-center gap-1 shadow-md border border-slate-800/40">
-                                            <span>★</span>
-                                            <span>{nota}</span>
-                                        </div>
-                                    </div>
+                                        {/* Container da Imagem */}
+                                        <div className="position-relative" style={{ pt: '133.33%', overflow: 'hidden', aspectRatio: '3/4' }}>
+                                            <img
+                                                src={imgUrl}
+                                                alt={Titulo}
+                                                className="card-img-top w-100 h-100 object-fit-cover transition-all"
+                                                style={{ transition: 'transform 0.3s ease' }}
+                                            />
 
-                                    {/* Detalhes do Jogo */}
-                                    <div className="p-5 flex-1 flex flex-col justify-between">
-                                        <div>
-                                            <h3 className="text-lg font-bold text-white tracking-tight leading-snug group-hover:text-yellow-500 transition-colors line-clamp-1">
-                                                {Titulo || "Sem título"}
-                                            </h3>
-                                            <p className="text-sm font-medium text-slate-500 mt-1">
-                                                {Ano_lancamento || "Ano N/A"}
-                                            </p>
+                                            {/* Badge de Nota flutuante */}
+                                            <span className="position-absolute top-0 end-0 m-3 badge bg-dark bg-opacity-75 border border-secondary text-warning px-2.5 py-2 rounded-3 fw-bold shadow-sm d-flex align-items-center gap-1">
+                                                ★ {nota}
+                                            </span>
                                         </div>
 
-                                        <button className="w-full mt-4 bg-slate-800/60 hover:bg-yellow-500 hover:text-black font-semibold py-2 px-4 rounded-lg text-sm text-slate-300 transition-all duration-200">
-                                            Ver Ficha Técnica
-                                        </button>
+                                        {/* Corpo do Card */}
+                                        <div className="card-body d-flex flex-column justify-content-between p-4">
+                                            <div>
+                                                <h3 className="card-title h5 fw-bold text-truncate mb-2 text-white">
+                                                    {Titulo || "Título Indisponível"}
+                                                </h3>
+                                                <span className="badge bg-dark text-secondary fw-semibold px-2.5 py-1">
+                                                    {Ano_lancamento || "N/A"}
+                                                </span>
+                                            </div>
+
+                                            <button className="btn btn-outline-secondary text-white fw-bold w-full mt-4 py-2 rounded-3 btn-custom-hover">
+                                                Ver Detalhes
+                                            </button>
+                                        </div>
+
                                     </div>
                                 </div>
                             );

@@ -1,3 +1,34 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Ajustes finos complementares ao Bootstrap */
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    background-color: #212529;
+}
+
+/* Efeito de zoom na imagem ao passar o rato no card */
+.col:hover .card-img-top {
+    transform: scale(1.04);
+}
+
+/* Mudar a cor do título do jogo quando passamos o rato no card */
+.col:hover .card-title {
+    color: #ffc107 !important; /* Cor warning do Bootstrap */
+}
+
+/* Customização do botão para ficar amarelo no hover */
+.btn-custom-hover {
+    border-color: #343a40 !important;
+    background-color: #2b3035;
+    transition: all 0.2s ease !important;
+}
+
+.btn-custom-hover:hover {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+    border-color: #ffc107 !important;
+}
+
+.text-white-hover:hover {
+    color: #ffffff !important;
+    transition: color 0.2s ease;
+}
