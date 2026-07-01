@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { fetchGames } from './api/api';
 
 export default async function HomePage() {
@@ -88,9 +89,9 @@ export default async function HomePage() {
                                                 </span>
                                             </div>
 
-                                            <button className="btn btn-outline-secondary text-white fw-bold w-full mt-4 py-2 rounded-3 btn-custom-hover">
+                                            <Link href={`/games/${game.id}`} className="btn btn-outline-secondary text-white fw-bold w-full mt-4 py-2 rounded-3 btn-custom-hover text-center d-block text-decoration-none">
                                                 Ver Detalhes
-                                            </button>
+                                            </Link>
                                         </div>
 
                                     </div>
